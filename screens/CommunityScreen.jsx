@@ -556,58 +556,51 @@ export default function CommunityScreen({ route, navigation }) {
         </View>
       ) : null}
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-      >
-        {isLoading && posts.length === 0 ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#d94c86" />
-            <Text style={styles.loadingText}>Loading community posts...</Text>
-          </View>
-        ) : (
-          <FlatList
-            ref={flatListRef}
-            data={posts}
-            renderItem={renderPost}
-            keyExtractor={(item) => item._id}
-            contentContainerStyle={styles.listContainer}
-            refreshControl={
-              <RefreshControl 
-                refreshing={refreshing} 
-                onRefresh={onRefresh} 
-                colors={["#d94c86"]} 
-                tintColor="#d94c86"
-              />
-            }
-            ListEmptyComponent={
-              <View style={styles.emptyContainer}>
-                <Ionicons name="chatbubbles-outline" size={60} color="#d94c86" style={{opacity: 0.5, marginBottom: 20}} />
-                <Text style={styles.emptyText}>No posts yet. Be the first to share!</Text>
-              </View>
-            }
-          />
-        )}
+      <View style={styles.mainContainer}>
+        <FlatList
+          ref={flatListRef}
+          data={posts}
+          renderItem={renderPost}
+          keyExtractor={(item) => item._id}
+          contentContainerStyle={styles.listContainer}
+          refreshControl={
+            <RefreshControl 
+              refreshing={refreshing} 
+              onRefresh={onRefresh} 
+              colors={["#d94c86"]} 
+              tintColor="#d94c86"
+            />
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Ionicons name="chatbubbles-outline" size={60} color="#d94c86" style={{opacity: 0.5, marginBottom: 20}} />
+              <Text style={styles.emptyText}>No posts yet. Be the first to share!</Text>
+            </View>
+          }
+        />
 
-        <Animated.View style={[styles.inputContainer, { height: postInputHeight }]}>
+        <View style={styles.inputContainer}>
           {showPostInput && (
             <>
-              {selectedImage && (
-                <View style={styles.imagePreviewContainer}>
-                  <Image source={{ uri: selectedImage }} style={styles.imagePreview} />
-                  <TouchableOpacity 
-                    style={styles.removeImageButton}
-                    onPress={() => setSelectedImage(null)}
+              <ScrollView style={styles.inputScrollView}>
+                {selectedImage && (
+                  <View style={styles.imagePreviewContainer}>
+                    <Image source={{ uri: selectedImage }} style={styles.imagePreview} />
+                    <TouchableOpacity 
+                      style={styles.removeImageButton}
+                      onPress={() => setSelectedImage(null)}
+                    >
+                      <Ionicons name="close-circle" size={22} color="#fff" />
+                    </TouchableOpacity>
+                  </View>
+                )}
+                
+                {selectedTags.length > 0 && (
+                  <ScrollView 
+                    horizontal 
+                    showsHorizontalScrollIndicator={false}
+                    style={styles.selectedTagsContainer}
                   >
-                    <Ionicons name="close-circle" size={22} color="#fff" />
-                  </TouchableOpacity>
-                </View>
-              )}
-              
-              {selectedTags.length > 0 && (
-                <View style={styles.selectedTagsContainer}>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     {selectedTags.map((tag, index) => (
                       <TouchableOpacity 
                         key={index} 
@@ -619,10 +612,8 @@ export default function CommunityScreen({ route, navigation }) {
                       </TouchableOpacity>
                     ))}
                   </ScrollView>
-                </View>
-              )}
-              
-              <View style={styles.inputRow}>
+                )}
+                
                 <TextInput
                   value={content}
                   onChangeText={setContent}
@@ -632,46 +623,34 @@ export default function CommunityScreen({ route, navigation }) {
                   style={styles.input}
                   maxLength={500}
                 />
+              </ScrollView>
+
+              <View style={styles.inputActions}>
+                <TouchableOpacity style={styles.mediaButton} onPress={pickImage}>
+                  <Ionicons name="image-outline" size={22} color="#d94c86" />
+                </TouchableOpacity>
                 
-                <View style={styles.inputActions}>
-                  <TouchableOpacity 
-                    style={styles.mediaButton} 
-                    onPress={pickImage}
-                    activeOpacity={0.7}
-                  >
-                    <Ionicons name="image-outline" size={22} color="#d94c86" />
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    style={styles.tagButton}
-                    onPress={() => setShowTagModal(true)}
-                    activeOpacity={0.7}
-                  >
-                    <Ionicons name="pricetag-outline" size={22} color="#d94c86" />
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={[
-                      styles.postButton, 
-                      (!content.trim() && !selectedImage) && styles.postButtonDisabled
-                    ]}
-                    onPress={createPost}
-                    disabled={isPosting || (!content.trim() && !selectedImage)}
-                    activeOpacity={0.8}
-                  >
-                    {isPosting ? (
-                      <ActivityIndicator size="small" color="#fff" />
-                    ) : (
-                      <Text style={styles.postButtonText}>Post</Text>
-                    )}
-                  </TouchableOpacity>
-                </View>
+                <TouchableOpacity style={styles.tagButton} onPress={() => setShowTagModal(true)}>
+                  <Ionicons name="pricetag-outline" size={22} color="#d94c86" />
+                </TouchableOpacity>
+                
+                <TouchableOpacity
+                  style={[styles.postButton, (!content.trim() && !selectedImage) && styles.postButtonDisabled]}
+                  onPress={createPost}
+                  disabled={isPosting || (!content.trim() && !selectedImage)}
+                >
+                  {isPosting ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Text style={styles.postButtonText}>Post</Text>
+                  )}
+                </TouchableOpacity>
               </View>
             </>
           )}
-        </Animated.View>
-      </KeyboardAvoidingView>
-      
+        </View>
+      </View>
+
       {/* Tag Selection Modal */}
       <Modal
         visible={showTagModal}
@@ -852,7 +831,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   listContainer: {
-    paddingBottom: 100,
+    paddingBottom: 20,
   },
   emptyContainer: {
     padding: 50,
@@ -1041,9 +1020,11 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     backgroundColor: '#ffffff',
-    padding: 10,
     borderTopWidth: 1,
     borderTopColor: '#eeeeee',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    maxHeight: 200, // Set maximum height
   },
   imagePreviewContainer: {
     position: 'relative',
@@ -1092,7 +1073,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10,
     fontSize: 15,
-    maxHeight: 100,
+    minHeight: 40,
+    maxHeight: 80, // Limit input height
     color: '#333333',
     marginBottom: 10,
   },
@@ -1100,6 +1082,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#eeeeee',
   },
   mediaButton: {
     padding: 8,
@@ -1173,5 +1158,13 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  mainContainer: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  inputScrollView: {
+    maxHeight: 150, // Adjust this value as needed
   },
 });

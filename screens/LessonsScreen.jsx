@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   View, 
   Text, 
@@ -15,29 +15,49 @@ import axios from 'axios';
 
 export default function LessonsScreen({ route, navigation }) {
   const { token } = route.params;
-  const [lessons, setLessons] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const hardcodedLessons = [
+    {
+      _id: '1',
+      title: 'Professional Communication Skills',
+      description: 'Master the art of workplace communication, public speaking, and presentation skills.',
+      skills: ['Communication', 'Public Speaking', 'Leadership'],
+      duration: '45',
+      thumbnailUrl: require('../assets/communicationskill.png')
+    },
+    {
+      _id: '2',
+      title: 'Financial Planning 101',
+      description: 'Learn essential financial planning skills for personal and professional growth.',
+      skills: ['Finance', 'Planning', 'Investment'],
+      duration: '30',
+      thumbnailUrl: require('../assets/finance.png')
+    },
+    {
+      _id: '3',
+      title: 'Digital Marketing Essentials',
+      description: 'Understand core concepts of digital marketing and social media strategy.',
+      skills: ['Marketing', 'Social Media', 'Analytics'],
+      duration: '35',
+      thumbnailUrl: require('../assets/marketing.jpg')
+    },
+    {
+      _id: '4',
+      title: 'Leadership & Team Management',
+      description: 'Develop effective leadership skills and learn to manage teams efficiently.',
+      skills: ['Leadership', 'Management', 'Team Building'],
+      duration: '40',
+      thumbnailUrl: require('../assets/leadership.png')
+    }
+  ];
+
+  const [lessons, setLessons] = useState(hardcodedLessons);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Keep fetchLessons function but don't use it
   const fetchLessons = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get('http://10.45.71.76:5000/api/lessons', {
-        headers: { 'x-auth-token': token },
-      });
-      setLessons(response.data);
-      setError(null);
-    } catch (error) {
-      console.error(error.response?.data || error.message);
-      setError('Unable to load lessons. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
+    // ...existing code...
   };
-
-  useEffect(() => {
-    fetchLessons();
-  }, []);
 
   const renderLessonItem = ({ item }) => (
     <TouchableOpacity 
@@ -54,23 +74,11 @@ export default function LessonsScreen({ route, navigation }) {
           </View>
         </View>
         
-        {item.videoUrl ? (
-          <Video 
-            source={{ uri: item.videoUrl }} 
-            style={styles.videoThumbnail}
-            resizeMode="cover"
-            useNativeControls={false}
-            posterSource={{ uri: item.thumbnailUrl || 'https://i.imgur.com/placeholder.png' }}
-            posterStyle={styles.videoThumbnail}
-            isLooping={false}
-          />
-        ) : (
-          <Image 
-            source={{ uri: item.thumbnailUrl || 'https://i.imgur.com/placeholder.png' }}
-            style={styles.videoThumbnail}
-            resizeMode="cover"
-          />
-        )}
+        <Image 
+          source={item.thumbnailUrl}
+          style={styles.videoThumbnail}
+          resizeMode="cover"
+        />
         
         <Text style={styles.lessonDescription}>
           {item.description || 'Learn valuable skills to advance your career and personal growth.'}
@@ -112,33 +120,13 @@ export default function LessonsScreen({ route, navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      
-      {loading ? (
-        <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color="#d94c86" />
-          <Text style={styles.loaderText}>Loading lessons...</Text>
-        </View>
-      ) : error ? (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={fetchLessons}>
-            <Text style={styles.retryButtonText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <FlatList
-          data={lessons.length > 0 ? lessons : [
-            {_id: '1', title: 'Introduction to Public Speaking', skills: ['Communication', 'Confidence'], duration: '25'},
-            {_id: '2', title: 'Negotiation Fundamentals', skills: ['Leadership', 'Business'], duration: '30'},
-            {_id: '3', title: 'Financial Independence', skills: ['Finance', 'Planning'], duration: '20'},
-          ]}
-          renderItem={renderLessonItem}
-          keyExtractor={(item) => item._id}
-          ListHeaderComponent={renderHeader}
-          contentContainerStyle={styles.listContent}
-        />
-      )}
-      
+      <FlatList
+        data={lessons}
+        renderItem={renderLessonItem}
+        keyExtractor={(item) => item._id}
+        ListHeaderComponent={renderHeader}
+        contentContainerStyle={styles.listContent}
+      />
       <View style={styles.tabBar}>
         <TouchableOpacity 
           style={styles.tabItem} 

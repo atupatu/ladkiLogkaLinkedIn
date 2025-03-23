@@ -9,6 +9,7 @@ import {
   Image,
   ScrollView
 } from 'react-native';
+import { Linking } from 'react-native'; // Add this import
 
 export default function HomeScreen({ route, navigation }) {
   const { token } = route.params;
@@ -39,7 +40,7 @@ export default function HomeScreen({ route, navigation }) {
           >
             <View style={[styles.cardIcon, styles.communityIcon]}>
               <Image 
-                source={{ uri: 'https://i.imgur.com/placeholder.png' }} 
+                source={require('../assets/community-icon.png')}
                 style={styles.iconImage}
                 resizeMode="contain"
               />
@@ -56,7 +57,7 @@ export default function HomeScreen({ route, navigation }) {
           >
             <View style={[styles.cardIcon, styles.mentorsIcon]}>
               <Image 
-                source={{ uri: 'https://i.imgur.com/placeholder.png' }} 
+                source={require('../assets/mentor-icon.png')} 
                 style={styles.iconImage}
                 resizeMode="contain"
               />
@@ -73,7 +74,7 @@ export default function HomeScreen({ route, navigation }) {
           >
             <View style={[styles.cardIcon, styles.lessonsIcon]}>
               <Image 
-                source={{ uri: 'https://i.imgur.com/placeholder.png' }} 
+                source={require('../assets/lessons.png')} 
                 style={styles.iconImage}
                 resizeMode="contain"
               />
@@ -90,7 +91,7 @@ export default function HomeScreen({ route, navigation }) {
           >
             <View style={[styles.cardIcon, styles.profileIcon]}>
               <Image 
-                source={{ uri: 'https://i.imgur.com/placeholder.png' }} 
+                source={require('../assets/profile-icon.png')} 
                 style={styles.iconImage}
                 resizeMode="contain"
               />
@@ -106,7 +107,7 @@ export default function HomeScreen({ route, navigation }) {
           <Text style={styles.featuredTitle}>Featured Story</Text>
           <View style={styles.featuredCard}>
             <Image 
-              source={{ uri: 'https://i.imgur.com/placeholder.png' }}
+              source={require('../assets/techjourney.png')}
               style={styles.featuredImage}
               resizeMode="cover"
             />
@@ -126,7 +127,10 @@ export default function HomeScreen({ route, navigation }) {
         
         <View style={styles.upcomingSection}>
           <Text style={styles.upcomingTitle}>Upcoming Events</Text>
-          <TouchableOpacity style={styles.eventCard}>
+          <TouchableOpacity 
+            style={styles.eventCard} 
+            onPress={() => Linking.openURL('https://meet.google.com/frx-msiv-pxc')} // Replace with your meet link
+          >
             <View style={styles.eventDateBox}>
               <Text style={styles.eventMonth}>APR</Text>
               <Text style={styles.eventDay}>15</Text>
